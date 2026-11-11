@@ -1,0 +1,57 @@
+<idea-plugin>
+    <id>com.github.mousechannel.gitblame</id>
+    <name>MouseChannel Git Blame</name>
+    <version>1.0.0</version>
+    <vendor>MouseChannel</vendor>
+
+    <description><![CDATA[
+        <p>Shows Git blame for the line under the caret (VS Code inline blame style), and optionally
+        for every line. Annotations are computed with the
+        <code>git blame --line-porcelain --contents</code> command, so they also reflect the current,
+        not yet saved editor content. Each annotation shows the author, the commit date and the commit
+        message of the last change of that line.</p>
+        <p>Features:</p>
+        <ul>
+            <li>Blame for the current line (default) or for the visible editor area</li>
+            <li>Optional "all lines" mode that annotates the visible editor area or the whole file in small files</li>
+            <li>Background computation with caching, so typing stays responsive</li>
+            <li>Automatic refresh when Git metadata changes (commit, checkout, rebase, ...)</li>
+            <li>Configurable author / date / commit message and file size limits</li>
+        </ul>
+        <p>The annotations can be toggled from <b>Tools | Git Blame Annotations</b> or the editor context menu.</p>
+    ]]></description>
+
+    <depends>com.intellij.modules.platform</depends>
+    <depends>Git4Idea</depends>
+
+    <extensions defaultExtensionNs="com.intellij">
+        <editorFactoryListener implementation="com.example.gitblame.GitBlameEditorFactoryListener"/>
+
+        <postStartupActivity implementation="com.example.gitblame.GitBlameStartupActivity"/>
+
+        <applicationConfigurable
+                id="com.github.mousechannel.gitblame.settings"
+                displayName="Git Blame"
+                instance="com.example.gitblame.GitBlameSettingsConfigurable"/>
+
+        <notificationGroup id="GitBlame" displayType="BALLOON"/>
+    </extensions>
+
+    <actions>
+        <action id="GitBlameInline.Toggle"
+                class="com.example.gitblame.ToggleGitBlameAction"
+                text="Git Blame Annotations"
+                description="Show inline Git blame annotations at the end of each line">
+            <add-to-group group-id="ToolsMenu" anchor="last"/>
+            <add-to-group group-id="EditorPopupMenu" anchor="last"/>
+            <keyboard-shortcut keymap="$default" first-keystroke="alt shift B"/>
+        </action>
+
+        <action id="GitBlameInline.Refresh"
+                class="com.example.gitblame.RefreshGitBlameAction"
+                text="Refresh Git Blame"
+                description="Drop the cached blame information and reload it for all open editors">
+            <add-to-group group-id="ToolsMenu" anchor="last"/>
+        </action>
+    </actions>
+</idea-plugin>
